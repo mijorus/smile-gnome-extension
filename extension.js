@@ -34,6 +34,8 @@ class Extension {
 
         const iface = this.loadInterface();
         this.dbus = imports.gi.Gio.DBusExportedObject.wrapJSObject(iface, this);
+        this.dbus.export(DBus.session, '/it/mijorus/smile');
+
         this.virtualKeyboard = undefined;
         this.timeoutId = undefined;
     }
@@ -86,7 +88,6 @@ class Extension {
     }
 
     enable() {
-        this.dbus.export(DBus.session, '/it/mijorus/smile');
     }
 
     disable() {
