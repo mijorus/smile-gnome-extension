@@ -30,7 +30,7 @@
 
 class Extension {
     constructor() {
-        debug('extension initialized');
+        console.log('extension initialized');
 
         const iface = this.loadInterface();
         this.dbus = imports.gi.Gio.DBusExportedObject.wrapJSObject(iface, this);
@@ -81,7 +81,7 @@ class Extension {
             const [, bytes] = file.load_contents(null);
             return imports.byteArray.toString(bytes);
         } catch (e) {
-            debug(`Failed to load D-Bus interface`);
+            console.log(`Failed to load D-Bus interface`);
         }
 
         return null;
