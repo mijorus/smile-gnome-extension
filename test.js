@@ -13,7 +13,6 @@ const interfaceXml = `
     </method>
     <signal name="CopiedEmoji">
       <arg name="type" type="s"/>
-      <arg name="value" type="b"/>
     </signal>
   </interface>
 </node>`;
@@ -34,9 +33,8 @@ class Service {
     }
 
     emitTestSignal() {
+        this._impl.emit_signal('CopiedEmoji', new GLib.Variant('(s)', ['TEST!']));
         console.log('send')
-        this._impl.emit_signal('CopiedEmoji',
-            new GLib.Variant('(sb)', ['string', true]));
     }
 }
 
@@ -63,7 +61,7 @@ function onNameLost(connection, name) {
     // Well behaved clients will know not to call methods on your interface now
 }
 
-const loop = GLib.MainLoop.new(null, false);
+//const loop = GLib.MainLoop.new(null, false);
 
 
 const ownerId = Gio.bus_own_name(
@@ -76,5 +74,3 @@ const ownerId = Gio.bus_own_name(
 );
 
 console.log(ownerId)
-
-loop.run();

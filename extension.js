@@ -18,12 +18,13 @@
  * Author: Lorenzo Paderi
  */
 
-const { GLib, Gio, Gdk, Clutter } = imports.gi;
+const { GLib, Gio, St, Clutter, Gdk } = imports.gi;
 
 class Extension {
     constructor() {
         // console.log('extension initialized');
         this.virtualKeyboard = undefined;
+        this.clipboard = undefined;
     }
 
     getVirtualKeyboard() {
@@ -37,30 +38,29 @@ class Extension {
         return this.virtualKeyboard;
     }
 
-    pasteEmoji(text) {
-        // let clipboard = Gdk.Clipboard();
+    pasteEmoji(params) {
+        this.clipboard.get_text(St.ClipboardType.PRIMARY, (__, text) => {
+            console.log(params)
 
-        // if (clipboard.get_content().get_value() !== text) {
-        //     let contextProvider = Gdk.ContentProvider.new_for_value(text);
-        //     clipboard.set_value(contextProvider);
-        // }
-        const eventTime = Clutter.get_current_event_time() * 1000;
-
-        this.timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
-            this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
-            this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
-            this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_v, KeyState.PRESSED);
-            this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
-            this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_v, Clutter.KeyState.RELEASED);
-            if (this.timeoutId) {
-                GLib.Source.remove(this.timeoutId);
-            }
-
-            this.timeoutId = undefined;
-        });
+            const eventTime = Clutter.get_current_event_time() * 1000;
+            this.timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
+                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_v, Clutter.KeyState.PRESSED);
+                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_v, Clutter.KeyState.RELEASED);
+                if (this.timeoutId) {
+                    GLib.Source.remove(this.timeoutId);
+                }
+    
+                this.timeoutId = undefined;
+            });
+        })
     }
 
     enable() {
+        this.clipboard = St.Clipboard.get_default();
+
         this.systemdSignalId = Gio.DBus.session.signal_subscribe(
             null,
             'it.mijorus.smile',
@@ -68,7 +68,10 @@ class Extension {
             '/it/mijorus/smile',
             null,
             Gio.DBusSignalFlags.NONE,
-            () => this.pasteEmoji(),
+            (connection, sender_name, object_path, interface_name, signal_name, params) => {
+                console.log(connection, sender_name, object_path, interface_name, signal_name, params)
+                this.pasteEmoji(params)
+            },
         );
     }
 
