@@ -1,7 +1,0 @@
-<node>
-  <interface name="it.mijorus.smile">
-    <method name="pasteEmoji">
-      <arg type="s" direction="in" name="input"/>
-    </method>
-  </interface>
-</node>
