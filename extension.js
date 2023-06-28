@@ -25,6 +25,7 @@ class Extension {
         // console.log('extension initialized');
         this.virtualKeyboard = undefined;
         this.clipboard = undefined;
+        this.dbusSignalId = undefined;
     }
 
     getVirtualKeyboard() {
@@ -40,7 +41,7 @@ class Extension {
 
     pasteEmoji(params) {
         this.clipboard.get_text(St.ClipboardType.PRIMARY, (__, text) => {
-            console.log(params)
+            console.log('PAsting TEXT')
 
             const eventTime = Clutter.get_current_event_time() * 1000;
             this.timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
@@ -52,7 +53,7 @@ class Extension {
                 if (this.timeoutId) {
                     GLib.Source.remove(this.timeoutId);
                 }
-    
+
                 this.timeoutId = undefined;
             });
         })
@@ -61,11 +62,11 @@ class Extension {
     enable() {
         this.clipboard = St.Clipboard.get_default();
 
-        this.systemdSignalId = Gio.DBus.session.signal_subscribe(
+        this.dbusSignalId = Gio.DBus.session.signal_subscribe(
             null,
             'it.mijorus.smile',
             'CopiedEmoji',
-            '/it/mijorus/smile',
+            '/it/mijorus/smile/actions',
             null,
             Gio.DBusSignalFlags.NONE,
             (connection, sender_name, object_path, interface_name, signal_name, params) => {
@@ -76,8 +77,13 @@ class Extension {
     }
 
     disable() {
-        if (this.loop) {
-            this.loop.quit();
+        if (this.timeoutId) {
+            GLib.Source.remove(this.timeoutId);
+        }
+
+        // unsub
+        if (this.dbusSignalId !== undefined) {
+            Gio.DBus.session.signal_unsubscribe(this.dbusSignalId)
         }
     }
 }
