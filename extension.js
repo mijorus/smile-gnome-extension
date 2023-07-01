@@ -39,9 +39,11 @@ class Extension {
         return this.virtualKeyboard;
     }
 
-    pasteEmoji(params) {
+    pasteEmoji(copiedText) {
         this.clipboard.get_text(St.ClipboardType.PRIMARY, (__, text) => {
-            console.log('PAsting TEXT')
+            if (text !== copiedText) {
+                this.clipboard.set_text(St.ClipboardType.PRIMARY, copiedText);
+            }
 
             const eventTime = Clutter.get_current_event_time() * 1000;
             this.timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
@@ -70,8 +72,7 @@ class Extension {
             null,
             Gio.DBusSignalFlags.NONE,
             (connection, sender_name, object_path, interface_name, signal_name, params) => {
-                console.log(connection, sender_name, object_path, interface_name, signal_name, params)
-                this.pasteEmoji(params)
+                this.pasteEmoji(params.get_child_value(0).get_string()[0])
             },
         );
     }
