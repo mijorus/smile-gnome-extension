@@ -1,7 +1,7 @@
 {
   "name": "Smile - complementary extension",
   "description": "Automatically paste Emojis from the Smile emoji picker",
-  "uuid": "smile-gnome-extension@mijorus.it",
+  "uuid": "smile-extension@mijorus.it",
   "url": "https://github.com/mijorus/smile-gnome-extension",
   "shell-version": [
     "42",
