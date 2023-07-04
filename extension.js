@@ -26,6 +26,7 @@ class Extension {
         this.virtualKeyboard = undefined;
         this.clipboard = undefined;
         this.dbusSignalId = undefined;
+        this.timeouts = [];
     }
 
     getVirtualKeyboard() {
@@ -39,27 +40,38 @@ class Extension {
         return this.virtualKeyboard;
     }
 
+    disableTimeouts() {
+        for (let t of this.timeouts) {
+            GLib.Source.remove(t);
+        }
+
+        this.timeouts = [];
+    }
+
     pasteEmoji(copiedText) {
         this.clipboard.get_text(St.ClipboardType.PRIMARY, (__, text) => {
             if (text !== copiedText) {
                 this.clipboard.set_text(St.ClipboardType.PRIMARY, copiedText);
             }
 
-            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+            const t1 = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
                 this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
                 this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
                 this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_v, Clutter.KeyState.PRESSED);
             });
 
-             GLib.timeout_add(GLib.PRIORITY_DEFAULT, 300, () => {
+            const t2 = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 300, () => {
                 this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
                 this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_v, Clutter.KeyState.RELEASED);
             });
+
+            this.timeouts.push(t1, t2);
         })
     }
 
     enable() {
         this.clipboard = St.Clipboard.get_default();
+        this.disableTimeouts();
 
         this.dbusSignalId = Gio.DBus.session.signal_subscribe(
             null,
@@ -75,9 +87,7 @@ class Extension {
     }
 
     disable() {
-        if (this.timeoutId) {
-            GLib.Source.remove(this.timeoutId);
-        }
+       this.disableTimeouts();
 
         // unsub
         if (this.dbusSignalId !== undefined) {
