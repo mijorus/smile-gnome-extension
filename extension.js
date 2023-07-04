@@ -45,18 +45,15 @@ class Extension {
                 this.clipboard.set_text(St.ClipboardType.PRIMARY, copiedText);
             }
 
-            const eventTime = Clutter.get_current_event_time() * 1000;
-            this.timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
-                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
-                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
-                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_v, Clutter.KeyState.PRESSED);
-                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
-                this.getVirtualKeyboard().notify_keyval(eventTime, Clutter.KEY_v, Clutter.KeyState.RELEASED);
-                if (this.timeoutId) {
-                    GLib.Source.remove(this.timeoutId);
-                }
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+                this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+                this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
+                this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_v, Clutter.KeyState.PRESSED);
+            });
 
-                this.timeoutId = undefined;
+             GLib.timeout_add(GLib.PRIORITY_DEFAULT, 300, () => {
+                this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+                this.getVirtualKeyboard().notify_keyval(Clutter.get_current_event_time(), Clutter.KEY_v, Clutter.KeyState.RELEASED);
             });
         })
     }
