@@ -23,15 +23,15 @@ import Gio from 'gi://Gio';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 
-import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 export default class SmileExtension extends Extension {
     constructor(metadata) {
         // console.log('extension initialized');
         super(metadata);
-        this.virtualKeyboard = undefined;
-        this.clipboard = undefined;
-        this.dbusSignalId = undefined;
+        this.virtualKeyboard = null;
+        this.clipboard = null;
+        this.dbusSignalId = null;
         this.timeouts = [];
     }
 
@@ -72,7 +72,7 @@ export default class SmileExtension extends Extension {
             });
 
             this.timeouts.push(t1, t2);
-        })
+        });
     }
 
     enable() {
@@ -87,17 +87,20 @@ export default class SmileExtension extends Extension {
             null,
             Gio.DBusSignalFlags.NONE,
             (connection, sender_name, object_path, interface_name, signal_name, params) => {
-                this.pasteEmoji(params.get_child_value(0).get_string()[0])
+                this.pasteEmoji(params.get_child_value(0).get_string()[0]);
             },
         );
     }
 
     disable() {
-       this.disableTimeouts();
+        this.disableTimeouts();
+        this.virtualKeyboard = null;
+        this.clipboard = null;
+        this.dbusSignalId = null;
 
         // unsub
         if (this.dbusSignalId !== undefined) {
-            Gio.DBus.session.signal_unsubscribe(this.dbusSignalId)
+            Gio.DBus.session.signal_unsubscribe(this.dbusSignalId);
         }
     }
 }
