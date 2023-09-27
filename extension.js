@@ -94,13 +94,14 @@ export default class SmileExtension extends Extension {
 
     disable() {
         this.disableTimeouts();
-        this.virtualKeyboard = null;
-        this.clipboard = null;
-        this.dbusSignalId = null;
 
         // unsub
         if (this.dbusSignalId !== undefined) {
             Gio.DBus.session.signal_unsubscribe(this.dbusSignalId);
         }
+
+        this.virtualKeyboard = null;
+        this.clipboard = null;
+        this.dbusSignalId = null;
     }
 }
