@@ -9,3 +9,7 @@ https://github.com/mijorus/smile
 ```
 zip -xrelease.zip -xREADME.md release.zip * 
 ```
+
+## ES5 release (GNOME 44 and older)
+
+Please refer to the branch called `44` 
