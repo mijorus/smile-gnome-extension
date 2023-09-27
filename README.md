@@ -13,3 +13,7 @@ zip -xrelease.zip -xREADME.md release.zip *
 ## ES5 release (GNOME 44 and older)
 
 Please refer to the branch called `44` 
+
+## Credits
+
+Thanks to [pesader](https://github.com/pesader)
