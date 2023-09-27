@@ -3,9 +3,5 @@
   "description": "Automatically paste Emojis from the Smile emoji picker",
   "uuid": "smile-extension@mijorus.it",
   "url": "https://github.com/mijorus/smile-gnome-extension",
-  "shell-version": [
-    "42",
-    "43",
-    "44"
-  ]
+  "shell-version": ["45"]
 }

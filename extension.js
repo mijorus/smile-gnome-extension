@@ -18,11 +18,17 @@
  * Author: Lorenzo Paderi
  */
 
-const { GLib, Gio, St, Clutter, Gdk } = imports.gi;
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
 
-class Extension {
-    constructor() {
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+
+export default class SmileExtension extends Extension {
+    constructor(metadata) {
         // console.log('extension initialized');
+        super(metadata);
         this.virtualKeyboard = undefined;
         this.clipboard = undefined;
         this.dbusSignalId = undefined;
@@ -94,8 +100,4 @@ class Extension {
             Gio.DBus.session.signal_unsubscribe(this.dbusSignalId)
         }
     }
-}
-
-function init() {
-    return new Extension();
 }
