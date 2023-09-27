@@ -7,5 +7,5 @@ https://github.com/mijorus/smile
 ## Publish a new release
 
 ```
-zip -xrelese.zip -xREADME.md release.zip * 
+zip -xrelease.zip -xREADME.md release.zip * 
 ```
