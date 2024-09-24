@@ -17,13 +17,18 @@
  * 
  * Author: Lorenzo Paderi
  */
+"use strict"
 
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+
+const AttentionHandler = Main.windowAttentionHandler;
+const DefaultDemandsAttention = AttentionHandler._onWindowDemandsAttention;
 
 export default class SmileExtension extends Extension {
     constructor(metadata) {
@@ -33,6 +38,8 @@ export default class SmileExtension extends Extension {
         this.clipboard = null;
         this.dbusSignalId = null;
         this.timeouts = [];
+
+        this.connectHandlers(this.skipNotification)
     }
 
     getVirtualKeyboard() {
@@ -75,6 +82,39 @@ export default class SmileExtension extends Extension {
         });
     }
 
+    skipNotification(display, window) {
+        if (window && !window.has_focus() && !window.is_skip_taskbar()) {
+            Main.activateWindow(window);
+        }
+    }
+
+    connectHandlers(func) {
+        if (AttentionHandler.hasOwnProperty('_windowDemandsAttentionId')
+            && AttentionHandler._windowDemandsAttentionId
+            && AttentionHandler.hasOwnProperty('_windowMarkedUrgentId')
+            && AttentionHandler._windowMarkedUrgentId
+        ) {
+            global.display.disconnect(AttentionHandler._windowDemandsAttentionId);
+            global.display.disconnect(AttentionHandler._windowMarkedUrgentId);
+
+            AttentionHandler._windowDemandsAttentionId = global.display.connect(
+                'window-demands-attention',
+                (display, window) => {
+                    console.log(JSON.stringify(window))
+                    func(display, window);
+                }
+            );
+
+            AttentionHandler._windowMarkedUrgentId = global.display.connect(
+                'window-marked-urgent',
+                (display, window) => {
+                    console.log(JSON.stringify(window))
+                    func(display, window);
+                }
+            );
+        }
+    }
+
     enable() {
         this.clipboard = St.Clipboard.get_default();
         this.disableTimeouts();
@@ -94,6 +134,7 @@ export default class SmileExtension extends Extension {
 
     disable() {
         this.disableTimeouts();
+        this.connectHandlers(DefaultDemandsAttention);
 
         // unsub
         if (this.dbusSignalId !== undefined) {
