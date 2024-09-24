@@ -33,6 +33,7 @@ export default class SmileExtension extends Extension {
         this.clipboard = null;
         this.dbusSignalId = null;
         this.timeouts = [];
+        this.listenerId = 0;
     }
 
     getVirtualKeyboard() {
@@ -75,9 +76,24 @@ export default class SmileExtension extends Extension {
         });
     }
 
+    onNewWindowCreated(window) {
+        if (window.get_gtk_application_id() === 'it.mijorus.smile'
+            && window.get_title() === 'Smile') {
+            window.raise_and_make_recent();
+            window.make_above();
+        }
+    }
+
     enable() {
         this.clipboard = St.Clipboard.get_default();
         this.disableTimeouts();
+
+        this.listenerId = global.display.connect('window-created', (_, window) => {
+            window.get_compositor_private().connect('realize', () => {
+                this.onNewWindowCreated(window)
+            });
+        })
+
 
         this.dbusSignalId = Gio.DBus.session.signal_subscribe(
             null,
@@ -94,6 +110,7 @@ export default class SmileExtension extends Extension {
 
     disable() {
         this.disableTimeouts();
+        global.display.disconnect(this.listenerId);
 
         // unsub
         if (this.dbusSignalId !== undefined) {
