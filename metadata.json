@@ -1,6 +1,6 @@
 {
   "name": "Smile - complementary extension",
-  "description": "Automatically paste Emojis from the Smile emoji picker",
+  "description": "Automatically paste Emojis from the Smile emoji picker\n\nTo launch the picker on Super+., you need to configure a keyboard shortcut:\n\n1. Go to Settings\n2. Select \"Keyboard\"\n3. Select \"View and Customize Shortcuts\"\n4.Scroll down to \"Custom Shortcuts\" and click it.\n5. Click on the plus sign\n6. Choose smile as name\n7. Choose \"flatpak run it.mijorus.smile\" as command (or another command launching smile in your environment)\n8. Click on \"Set Shortcut...\".\n9. Press Suüer+.\n10. Click on \"Add\".\n11. Close all dialogs\n12. Super+. should work now",
   "uuid": "smile-extension@mijorus.it",
   "url": "https://github.com/mijorus/smile-gnome-extension",
   "shell-version": ["45", "46", "47","48"]
