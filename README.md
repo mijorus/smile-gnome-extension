@@ -16,10 +16,9 @@ To launch the picker on <kbd>Super</kbd>+<kbd>.</kbd>, you need to ensure that s
 6. Choose smile as name
 7. Input `flatpak run it.mijorus.smile` as command (or another command launching smile in your environment)
 8. Click on "Set Shortcut..."
-9. Press <kbd>Super</kbd>+<kbd>.</kbd>.
+9. Type a shortcut.
 10. Click on "Add".
-11. Close all dialogs
-12. <kbd>Super</kbd>+<kbd>.</kbd> should work now.
+11. Done
 
 ## Publish a new release
 
