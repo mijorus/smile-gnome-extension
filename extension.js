@@ -42,7 +42,10 @@ export default class SmileExtension extends Extension {
         }
 
         let deviceType = Clutter.InputDeviceType.KEYBOARD_DEVICE;
-        this.virtualKeyboard = Clutter.get_default_backend().get_default_seat().create_virtual_device(deviceType);
+        // GNOME 51 removed Clutter.get_default_backend(): newer GNOME reaches
+        // the backend through the stage's context, older versions keep the old call.
+        const backend = global.stage.context?.get_backend?.() ?? Clutter.get_default_backend();
+        this.virtualKeyboard = backend.get_default_seat().create_virtual_device(deviceType);
 
         return this.virtualKeyboard;
     }
